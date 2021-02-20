@@ -1,9 +1,14 @@
 from dbfread import DBF
 import dataset
 import csv
+from shutil import copyfile
 
 
-def main_from_ostatki(filename):
+FILENAME = 'gaz.dbf'
+DBF_PATH = 'c:\\ks\\server'
+
+
+def main_from_ostatki(filename=FILENAME):
     """
     function add to site data from report остатки по уровням
     :param filename:
@@ -24,7 +29,6 @@ def main_from_ostatki(filename):
 
     with open("gaz_site.csv", mode="w", encoding='utf-8', newline='') as w_file:
         file_writer = csv.writer(w_file, delimiter=",")
-        # file_writer = csv.writer(w_file, delimiter=",", escapechar=' ', quoting=csv.QUOTE_NONE)
         for record in _dbf:
             group = []
 
@@ -32,12 +36,11 @@ def main_from_ostatki(filename):
                 name = f'naim{i}'
                 if record[name] != '':
                     group.append(record[name])
-            # group = group + ' > ' + record['naim']
             group.append(record['naim'])
             group_txt = ' > '.join(group)
             try:
                 cena_v_bazu = float(record['cena_pr'])
-            except:
+            except TypeError:
                 print(f'{record["kodpr"]} - нет цены')
                 cena_v_bazu = 0.0
             min_party = 0
@@ -57,8 +60,14 @@ def main_from_ostatki(filename):
 def main_from_prod():
     """
     function add to site data from 5 prod.dbf - товары and 7 marki.dbf - группы
+    from /dbf directory
     :return:
     """
+
+
+    copyfile(DBF_PATH+'\\prod.dbf', './dbf/prod.dbf')
+    copyfile(DBF_PATH + '\\marki.dbf', './dbf/marki.dbf')
+
     db = dataset.connect('sqlite:///:memory:')
     table_marki = db['marki']
 
@@ -76,7 +85,7 @@ def main_from_prod():
             except:
                 print(f'{record["kodpr"]} - нет цены')
                 cena_v_bazu = 0.0
-            if cena_v_bazu<= 0:
+            if cena_v_bazu <= 0:
                 print(f'{record["kodpr"]} - нет цены')
                 continue
 
