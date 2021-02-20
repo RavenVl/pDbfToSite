@@ -4,6 +4,11 @@ import csv
 
 
 def main_from_ostatki(filename):
+    """
+    function add to site data from report остатки по уровням
+    :param filename:
+    :return:
+    """
     pathDBF = filename
     _dbf = DBF(pathDBF, lowernames=True)
     for record in _dbf:
@@ -50,20 +55,20 @@ def main_from_ostatki(filename):
 
 
 def main_from_prod():
+    """
+    function add to site data from 5 prod.dbf - товары and 7 marki.dbf - группы
+    :return:
+    """
     db = dataset.connect('sqlite:///:memory:')
     table_marki = db['marki']
 
     for record in DBF('./dbf/marki.dbf', lowernames=True):
         table_marki.insert(record)
 
-    table_prod = db['prod']
-    for record in DBF('./dbf/prod.dbf', lowernames=True):
-        table_prod.insert(record)
-
     with open("gaz_site_2.csv", mode="w", encoding='utf-8', newline='') as w_file:
         file_writer = csv.writer(w_file, delimiter=",")
         # file_writer = csv.writer(w_file, delimiter=",", escapechar=' ', quoting=csv.QUOTE_NONE)
-        for record in table_prod.all():
+        for record in DBF('./dbf/prod.dbf', lowernames=True):
 
             group = group_name_from_marki(str(record['kodm']), table_marki)
             try:
