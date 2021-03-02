@@ -4,7 +4,6 @@ import csv
 from shutil import copyfile
 import os
 
-
 FILENAME = 'gaz.dbf'
 DBF_PATH = 'c:\\ks\\server'
 
@@ -68,7 +67,7 @@ def main_from_prod():
     dirname = os.path.dirname(__file__)
     prod_filename = os.path.join(dirname, 'dbf/prod.dbf')
     marki_filename = os.path.join(dirname, 'dbf/marki.dbf')
-    result_filename = os.path.join(dirname, '../gaz_site_2.csv')
+    result_filename = os.path.join(dirname, '../1.csv')
 
     copyfile(DBF_PATH + '\\prod.dbf', prod_filename)
     copyfile(DBF_PATH + '\\marki.dbf', marki_filename)
@@ -85,6 +84,9 @@ def main_from_prod():
         for record in DBF(prod_filename, lowernames=True):
 
             group = group_name_from_marki(str(record['kodm']), table_marki)
+            if group is None or group.strip() == '':
+                print(f'{record["kodpr"]} - нет группы')
+                continue
             try:
                 cena_v_bazu = float(record['cena_pr'])
             except:
@@ -108,13 +110,16 @@ def group_name_from_marki(kodm, table_marki=None):
             table_marki.insert(record)
 
     cur_marka = table_marki.find_one(kodm=kodm)
-    print(cur_marka)
+    if cur_marka is None:
+        print(f'Нет группы  - {kodm}')
+        return None
 
-    if kodm == cur_marka['kodur'].strip():
+    arr_kodur = cur_marka['kodur'].split()
+    if len(arr_kodur) == 1:
         rez = cur_marka['naim']
     else:
         rez = ''
-        arr_kodur = cur_marka['kodur'].split()[:-1]
+        arr_kodur = arr_kodur[:-1]
         kod_v_base = ''
         for kodur in arr_kodur:
             len_space = 5 - len(kodur)
@@ -126,6 +131,9 @@ def group_name_from_marki(kodm, table_marki=None):
                 rez = f'{rez} > {name_kodur}'
             pass
         rez += f' > {cur_marka["naim"]}'
+
+
+
 
     return rez
 
