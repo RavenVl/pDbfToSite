@@ -3,6 +3,7 @@ import dataset
 import csv
 from shutil import copyfile
 import os
+from decimal import Decimal
 
 FILENAME = 'gaz.dbf'
 DBF_PATH = 'c:\\ks\\server'
@@ -39,7 +40,7 @@ def main_from_ostatki(filename=FILENAME):
             group.append(record['naim'])
             group_txt = ' > '.join(group)
             try:
-                cena_v_bazu = float(record['cena_pr'])
+                cena_v_bazu = Decimal(record['cena_pr'])
             except TypeError:
                 print(f'{record["kodpr"]} - нет цены')
                 cena_v_bazu = 0.0
@@ -88,7 +89,7 @@ def main_from_prod():
                 print(f'{record["kodpr"]} - нет группы')
                 continue
             try:
-                cena_v_bazu = float(record['cena_pr'])
+                cena_v_bazu = Decimal(record['cena_pr'])
             except:
                 print(f'{record["kodpr"]} - нет цены')
                 cena_v_bazu = 0.0
